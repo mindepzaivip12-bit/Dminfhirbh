@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ADMIN - TẠO KEY</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Share Tech Mono', monospace; }
+        body { background-color: #03080e; color: #a4f4f9; padding: 20px; display: flex; justify-content: center; align-items: center; min-height: 100vh;}
+        .container { width: 100%; max-width: 500px; border: 1px solid #005f63; padding: 25px; background: rgba(0, 243, 255, 0.02); box-shadow: 0 0 20px rgba(0, 243, 255, 0.1); }
+        h2 { font-family: 'Orbitron'; color: #00f3ff; text-align: center; margin-bottom: 25px; text-shadow: 0 0 10px #00f3ff; }
+        .form-group { display: flex; flex-direction: column; gap: 15px; margin-bottom: 20px; }
+        select { padding: 15px; background: #06121a; border: 1px solid #005f63; color: #00f3ff; outline: none; font-size: 16px; }
+        button { padding: 15px; background: #00f3ff; color: #000; border: none; font-weight: bold; cursor: pointer; font-family: 'Orbitron'; transition: 0.2s; font-size: 16px;}
+        button:hover { background: #fff; box-shadow: 0 0 15px #00f3ff; }
+        .result-box { margin-top: 20px; padding: 20px; border: 1px dashed #00ff88; background: rgba(0, 255, 136, 0.05); text-align: center; display: none; }
+        .result-box.active { display: block; }
+        .key-display { font-size: 24px; color: #00ff88; font-weight: bold; letter-spacing: 2px; margin: 15px 0; word-break: break-all;}
+        .btn-copy { background: #00ff88; color: #000; padding: 10px 20px; font-size: 14px; width: auto; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h2>HỆ THỐNG TẠO KEY</h2>
+        
+        <div class="form-group">
+            <select id="key-days">
+                <option value="1">Gói 1 Ngày (11.000đ)</option>
+                <option value="3">Gói 3 Ngày (45.000đ)</option>
+                <option value="5">Gói 5 Ngày (65.000đ)</option>
+                <option value="7">Gói 7 Ngày (85.000đ)</option>
+            </select>
+            <button onclick="generateAlgorithmicKey()">TẠO KEY NGAY</button>
+        </div>
+
+        <div class="result-box" id="result-box">
+            <p style="color: #888; font-size: 14px;">Mã Key của khách:</p>
+            <div class="key-display" id="key-result">...</div>
+            <button class="btn-copy" onclick="copyKey()">📋 COPY KEY</button>
+        </div>
+    </div>
+
+    <script>
+        // ⚠️ ĐỔI CHUỖI NÀY THÀNH MỘT CHUỖI BÍ MẬT CỦA BẠN (Phải giống hệt bên index.html)
+        const SECRET_KEY = "cskhleminh_sunwin_2024";
+
+        function hashStr(str) {
+            let hash = 0;
+            for (let i = 0; i < str.length; i++) {
+                const char = str.charCodeAt(i);
+                hash = ((hash << 5) - hash) + char;
+                hash = hash & hash; 
+            }
+            return Math.abs(hash).toString(16).toUpperCase().substring(0, 4).padEnd(4, 'X');
+        }
+
+        function generateAlgorithmicKey() {
+            const days = parseInt(document.getElementById('key-days').value);
+            const expiryTime = Date.now() + (days * 24 * 60 * 60 * 1000);
+            const signature = hashStr(expiryTime + SECRET_KEY);
+            const finalKey = `VIP-${expiryTime}-${signature}`;
+
+            document.getElementById('result-box').classList.add('active');
+            document.getElementById('key-result').innerText = finalKey;
+        }
+
+        function copyKey() {
+            const keyText = document.getElementById('key-result').innerText;
+            navigator.clipboard.writeText(keyText).then(() => {
+                alert("Đã copy Key: " + keyText + "\nHãy gửi Key này cho khách hàng.");
+            });
+        }
+    </script>
+</body>
+</html>
